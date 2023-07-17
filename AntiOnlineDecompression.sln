@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiOnlineDecompression", "AntiOnlineDecompression.csproj", "{983C515F-2AEB-4592-96AA-F5C61FA5A976}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{983C515F-2AEB-4592-96AA-F5C61FA5A976}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{983C515F-2AEB-4592-96AA-F5C61FA5A976}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{983C515F-2AEB-4592-96AA-F5C61FA5A976}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{983C515F-2AEB-4592-96AA-F5C61FA5A976}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9A7466E7-39B8-44EF-BC2A-80A80087EAD2}
+	EndGlobalSection
+EndGlobal
