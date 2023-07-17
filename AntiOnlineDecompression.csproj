@@ -5,15 +5,22 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<StartupObject>AntiOnlineDecompression.Program</StartupObject>
 		<Nullable>enable</Nullable>
-		
+
+
+		<IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
+		<IlcTrimMetadata>true</IlcTrimMetadata>
+		<IlcDisableReflection>true</IlcDisableReflection>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<IlcOptimizationPreference>Size</IlcOptimizationPreference>
+		<IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
 		<TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
-		<OptimizationPreference>Size</OptimizationPreference>
 		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
 		<DebuggerSupport>false</DebuggerSupport>
 		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
 		<EventSourceSupport>false</EventSourceSupport>
 		<MetadataUpdaterSupport>false</MetadataUpdaterSupport>
 		<UseSystemResourceKeys>true</UseSystemResourceKeys>
+		
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

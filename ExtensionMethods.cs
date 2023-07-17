@@ -165,6 +165,7 @@ namespace AntiOnlineDecompression
                 byte[] encryptedBuffer = new byte[bytesRead];
                 Encrypto.EncryptBytes(encryptedBuffer, buffer.AsMemory(0, bytesRead).ToArray());
                 await encrypted.WriteAsync(encryptedBuffer);
+
             }
         }
         public static async Task Decrypto(this Stream encrypted, Stream data, byte[] key, byte[] iv)

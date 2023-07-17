@@ -63,7 +63,7 @@ namespace AntiOnlineDecompression
                         Key = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()),
                         Hash = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()),
                         Name = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()).BytesToString()
-                    };
+                };
                 }
             }
             public static async Task Encrypto(Stream data, Stream cryptodata, byte[] key)
@@ -149,6 +149,7 @@ namespace AntiOnlineDecompression
                 using FileStream InputFile = file.Open(FileMode.Open, FileAccess.Read);
                 if (InputFile.StreamRead(0, 4).BytesToString() != "AODF")
                 {
+                    Console.WriteLine("加密中...");
                     byte[] Key = RandomBytes(32);
                     string EncryptoFileName;
                     EncryptoFileName = (await InputFile.SHA256HashAsync()).BytesToHexString();
@@ -183,6 +184,7 @@ namespace AntiOnlineDecompression
                     {
                         throw new Exception($"加密文件校验失败！SHA256:{EncryptFileHash.BytesToHexString()}");
                     }
+                    Console.WriteLine("解密中...");
                     using FileStream DecryptFile = new(cryptoKey.Name, FileMode.Create);
                     await Crypto.Decrypto(InputFile, DecryptFile, cryptoKey.Key);
                     Console.WriteLine("解密完成。");
