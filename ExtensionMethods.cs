@@ -126,9 +126,9 @@ namespace AntiOnlineDecompression
         {
             int p = pos;
             pos += length;
-            return bytes[p..(p+length)];
+            return bytes[p..(p + length)];
         }
-        
+
         public static byte[] StringToBytes(string value)
         {
             return Encoding.UTF8.GetBytes(value);
@@ -154,9 +154,9 @@ namespace AntiOnlineDecompression
             }
             return BitConverter.ToInt32(value);
         }
-        
+
         public static async Task Encrypto(this Stream data, Stream encrypted, byte[] key, byte[] iv)
-        { 
+        {
             int bytesRead;
             byte[] buffer = new byte[102400000];
             ChaCha20 Encrypto = new(key, iv, 0);

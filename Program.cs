@@ -63,7 +63,7 @@ namespace AntiOnlineDecompression
                         Key = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()),
                         Hash = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()),
                         Name = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()).BytesToString()
-                };
+                    };
                 }
             }
             public static async Task Encrypto(Stream data, Stream cryptodata, byte[] key)
