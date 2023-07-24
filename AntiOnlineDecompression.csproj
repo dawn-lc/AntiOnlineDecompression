@@ -6,7 +6,7 @@
 		<StartupObject>AntiOnlineDecompression.Program</StartupObject>
 		<Nullable>enable</Nullable>
 
-
+		<StripSymbols>true</StripSymbols>
 		<IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
 		<IlcTrimMetadata>true</IlcTrimMetadata>
 		<IlcDisableReflection>true</IlcDisableReflection>
@@ -15,12 +15,10 @@
 		<IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
 		<TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
 		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
-		<DebuggerSupport>false</DebuggerSupport>
 		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
 		<EventSourceSupport>false</EventSourceSupport>
 		<MetadataUpdaterSupport>false</MetadataUpdaterSupport>
 		<UseSystemResourceKeys>true</UseSystemResourceKeys>
-		
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

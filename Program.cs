@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Linq;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using static AntiOnlineDecompression.ExtensionMethods;
 
 namespace AntiOnlineDecompression
@@ -21,21 +20,19 @@ namespace AntiOnlineDecompression
                 public required byte[] Hash { get; set; }
                 public byte[] Serialize()
                 {
-                    List<byte> data = new();
-                    data.AddRange(IntToBytes(IV.Length));
-                    data.AddRange(IV);
-                    data.AddRange(IntToBytes(Hash.Length));
-                    data.AddRange(Hash);
+                    MemoryStream data = new();
+                    data.Write(IntToBytes(IV.Length));
+                    data.Write(IV);
+                    data.Write(IntToBytes(Hash.Length));
+                    data.Write(Hash);
                     return data.ToArray();
                 }
-
-                internal static CryptoHead Deserialize(byte[] bytes)
+                internal static CryptoHead Deserialize(Stream stream)
                 {
-                    int pos = 0;
-                    return new CryptoHead()
+                    return new()
                     {
-                        IV = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()),
-                        Hash = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt())
+                        IV = stream.BytesRead(stream.BytesRead(4).BytesToInt()),
+                        Hash = stream.BytesRead(stream.BytesRead(4).BytesToInt())
                     };
                 }
             }
@@ -46,24 +43,23 @@ namespace AntiOnlineDecompression
                 public required string Name { get; set; }
                 public byte[] Serialize()
                 {
-                    List<byte> data = new();
-                    data.AddRange(IntToBytes(Key.Length));
-                    data.AddRange(Key);
-                    data.AddRange(IntToBytes(Hash.Length));
-                    data.AddRange(Hash);
-                    data.AddRange(IntToBytes(StringToBytes(Name).Length));
-                    data.AddRange(StringToBytes(Name));
+                    MemoryStream data = new();
+                    data.Write(IntToBytes(Key.Length));
+                    data.Write(Key);
+                    data.Write(IntToBytes(Hash.Length));
+                    data.Write(Hash);
+                    data.Write(IntToBytes(StringToBytes(Name).Length));
+                    data.Write(StringToBytes(Name));
                     return data.ToArray();
                 }
-                internal static CryptoKey Deserialize(byte[] bytes)
+                internal static CryptoKey Deserialize(Stream stream)
                 {
-                    int pos = 0;
                     return new()
                     {
-                        Key = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()),
-                        Hash = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()),
-                        Name = bytes.BytesRead(ref pos, bytes.BytesRead(ref pos, 4).BytesToInt()).BytesToString()
-                };
+                        Key = stream.BytesRead(stream.BytesRead(4).BytesToInt()),
+                        Hash = stream.BytesRead(stream.BytesRead(4).BytesToInt()),
+                        Name = stream.BytesRead(stream.BytesRead(4).BytesToInt()).BytesToString()
+                    };
                 }
             }
             public static async Task Encrypto(Stream data, Stream cryptodata, byte[] key)
@@ -76,10 +72,8 @@ namespace AntiOnlineDecompression
                     IV = RandomBytes(12),
                     Hash = await data.SHA256HashAsync()
                 };
-                byte[] HeadBytes = Head.Serialize();
                 await cryptodata.WriteAsync(StringToBytes("AODF"));
-                await cryptodata.WriteAsync(IntToBytes(HeadBytes.Length));
-                await cryptodata.WriteAsync(HeadBytes);
+                await cryptodata.WriteAsync(Head.Serialize());
 
                 await data.Encrypto(cryptodata, key, Head.IV);
 
@@ -91,9 +85,9 @@ namespace AntiOnlineDecompression
                 long SaveCryptoDataPosition = cryptodata.Position;
                 data.SetLength(0);
 
-                int HeadLength = cryptodata.StreamRead(4, 8).BytesToInt();
-                CryptoHead FileHead = CryptoHead.Deserialize(cryptodata.StreamRead(8, 8 + HeadLength));
-                cryptodata.Seek(8 + HeadLength, SeekOrigin.Begin);
+                cryptodata.Seek(4, SeekOrigin.Begin);
+                CryptoHead FileHead = CryptoHead.Deserialize(cryptodata);
+
                 await cryptodata.Decrypto(data, key, FileHead.IV);
                 data.Seek(0, SeekOrigin.Begin);
                 if (!(await data.SHA256HashAsync()).SequenceCompare(FileHead.Hash))
@@ -108,12 +102,18 @@ namespace AntiOnlineDecompression
 
         static async Task<int> Main(string[] args)
         {
+            Console.CursorVisible = false;
             try
             {
                 FileInfo? file;
                 if (!args.Any())
                 {
-                    IEnumerable<FileInfo> fileInfos = new DirectoryInfo(Environment.CurrentDirectory).GetFiles().Where(i => i.FullName != Environment.ProcessPath);
+                    FileInfo[] fileInfos = new DirectoryInfo(Environment.CurrentDirectory).GetFiles();
+                    fileInfos = fileInfos.Where(i => i.FullName != Environment.ProcessPath).ToArray();
+                    if (fileInfos.Length < 2)
+                    {
+                        throw new Exception($"未找到需要解密的文件！");
+                    }
                     file = fileInfos.FirstOrDefault(i =>
                     {
                         FileStream? stream = null;
@@ -131,9 +131,9 @@ namespace AntiOnlineDecompression
                             stream?.Dispose();
                         }
                     });
-                    if (!fileInfos.Any() || fileInfos.Count() < 2 || file == null)
+                    if ( file == default(FileInfo?) || file is null )
                     {
-                        throw new FileNotFoundException($"待解密文件不存在或无法访问！");
+                        throw new Exception($"在检索程序目录下可能需要解密的文件时，未找到符合条件的文件或文件无法访问！");
                     }
                 }
                 else
@@ -142,54 +142,67 @@ namespace AntiOnlineDecompression
                 }
                 if (!file.Exists)
                 {
-                    throw new FileNotFoundException(args[0]);
+                    throw new Exception(args[0]);
                 }
                 Crypto.CryptoKey cryptoKey;
 
                 using FileStream InputFile = file.Open(FileMode.Open, FileAccess.Read);
                 if (InputFile.StreamRead(0, 4).BytesToString() != "AODF")
                 {
-                    Console.WriteLine("加密中...");
+                    string EncryptFileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
+                    string EncryptFileDirectoryName = file.DirectoryName ?? Environment.CurrentDirectory;
+
+                    Console.Write("加密中...");
                     byte[] Key = RandomBytes(32);
-                    string EncryptoFileName;
-                    EncryptoFileName = (await InputFile.SHA256HashAsync()).BytesToHexString();
-                    using FileStream EncryptFile = new($"{EncryptoFileName}", FileMode.OpenOrCreate);
+                    using FileStream EncryptFile = new(Path.Combine(EncryptFileDirectoryName, EncryptFileName), FileMode.OpenOrCreate);
                     await Crypto.Encrypto(InputFile, EncryptFile, Key);
+                    Console.WriteLine($" 100%   ");
                     cryptoKey = new()
                     {
                         Key = Key,
                         Hash = await EncryptFile.SHA256HashAsync(),
                         Name = file.Name
                     };
-                    using (FileStream KeyFile = new($"{EncryptoFileName}.key", FileMode.Create))
+                    using (FileStream KeyFile = new($"{Path.Combine(EncryptFileDirectoryName, EncryptFileName)}.aodk", FileMode.Create))
                     {
                         KeyFile.SetLength(0);
+                        await KeyFile.WriteAsync(StringToBytes("AODK"));
                         await KeyFile.WriteAsync(cryptoKey.Serialize());
                     }
                     Console.WriteLine("加密完成。");
                     return 0;
                 }
-                else
+                else if (File.Exists($"{file.FullName}.aodk"))
                 {
-                    if (!File.Exists($"{file.FullName}.key"))
+                    using (FileStream KeyFile = new($"{file.FullName}.aodk", FileMode.Open))
                     {
-                        throw new FileNotFoundException($"解密密钥 {file.FullName}.key 不存在或无法访问！");
+                        try
+                        {
+                            if (KeyFile.StreamRead(0, 4).BytesToString() == "AODK")
+                            {
+                                KeyFile.Seek(4, SeekOrigin.Begin);
+                            }
+                            cryptoKey = Crypto.CryptoKey.Deserialize(KeyFile);
+                        }
+                        catch (Exception)
+                        {
+                            throw new Exception("解密密钥格式错误！");
+                        }
                     }
-                    using (FileStream KeyFile = new($"{file.FullName}.key", FileMode.Open))
-                    {
-                        cryptoKey = Crypto.CryptoKey.Deserialize(KeyFile.StreamRead(0, KeyFile.Length));
-                    }
+                    Console.WriteLine("校验文件中...");
                     byte[] EncryptFileHash = await InputFile.SHA256HashAsync();
                     if (!EncryptFileHash.SequenceCompare(cryptoKey.Hash))
                     {
                         throw new Exception($"加密文件校验失败！SHA256:{EncryptFileHash.BytesToHexString()}");
                     }
-                    Console.WriteLine("解密中...");
+                    Console.Write("解密中...");
                     using FileStream DecryptFile = new(cryptoKey.Name, FileMode.Create);
                     await Crypto.Decrypto(InputFile, DecryptFile, cryptoKey.Key);
+                    Console.WriteLine($" 100%   ");
                     Console.WriteLine("解密完成。");
                     return 0;
                 }
+                throw new Exception("未找到任何可用的文件");
             }
             catch (Exception ex)
             {
