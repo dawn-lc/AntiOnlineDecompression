@@ -207,7 +207,8 @@ namespace AntiOnlineDecompression
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.ReadKey();
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                    Console.ReadKey();
                 return 1;
             }
         }
