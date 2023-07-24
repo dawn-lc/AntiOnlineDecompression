@@ -211,6 +211,10 @@ namespace AntiOnlineDecompression
                     Console.ReadKey();
                 return 1;
             }
+            finally
+            {
+                Console.CursorVisible = true;
+            }
         }
     }
 }

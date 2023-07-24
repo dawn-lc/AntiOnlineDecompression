@@ -138,7 +138,7 @@ namespace AntiOnlineDecompression
                 byte[] decryptedBuffer = new byte[bytesRead];
                 Decrypto.DecryptBytes(decryptedBuffer, buffer.AsMemory(0, bytesRead).ToArray());
                 await data.WriteAsync(decryptedBuffer);
-                CoverWrite($" {(encrypted.Position / encrypted.Length) * 100:f2}%");
+                CoverWrite($" {(encrypted.Position / (double)encrypted.Length) * 100:f2}%");
             }
         }
     }
