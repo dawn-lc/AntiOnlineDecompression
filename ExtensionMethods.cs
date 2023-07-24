@@ -118,7 +118,7 @@ namespace AntiOnlineDecompression
         public static async Task Encrypto(this Stream data, Stream encrypted, byte[] key, byte[] iv)
         {
             int bytesRead;
-            byte[] buffer = new byte[1024 * 1024 * 2];
+            byte[] buffer = new byte[1024 * 1024 * 8];
             ChaCha20 Encrypto = new(key, iv, 0);
             while ((bytesRead = await data.ReadAsync(buffer)) != 0)
             {
@@ -131,7 +131,7 @@ namespace AntiOnlineDecompression
         public static async Task Decrypto(this Stream encrypted, Stream data, byte[] key, byte[] iv)
         {
             int bytesRead;
-            byte[] buffer = new byte[1024 * 1024 * 2];
+            byte[] buffer = new byte[1024 * 1024 * 4];
             ChaCha20 Decrypto = new(key, iv, 0);
             while ((bytesRead = await encrypted.ReadAsync(buffer)) != 0)
             {
