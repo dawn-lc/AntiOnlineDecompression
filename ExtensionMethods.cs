@@ -50,25 +50,35 @@ namespace AntiOnlineDecompression
             if (a.Length != b.Length) return false;
             return a.SequenceEqual(b);
         }
+        public static async Task VerifyHash(this Stream stream, byte[] hash)
+        {
+            Console.WriteLine("校验中...");
+            byte[] streamHash = await stream.SHA256HashAsync();
+            if (!streamHash.SequenceCompare(hash))
+            {
+                throw new Exception($"校验失败！{Environment.NewLine}(A)SHA256:{streamHash.BytesToHexString()}{Environment.NewLine}(B)SHA256:{hash.BytesToHexString()}");
+            }
+            Console.WriteLine("校验完成。");
+        }
         public static byte[] RandomBytes(int length)
         {
             return RandomNumberGenerator.GetBytes(length);
         }
         public static byte[] StreamRead(this Stream stream, long a, long b)
         {
-            if ((b - a) > int.MaxValue || stream.Length  < 4)
+            if ((b - a) > int.MaxValue || stream.Length < 4)
             {
                 throw new OverflowException();
             }
             long save = stream.Position;
             int DataLength = (int)(b - a);
-            byte[] ReadData = new byte[DataLength];
+            byte[] ReadData;
             stream.Seek(a, SeekOrigin.Begin);
-            stream.Read(ReadData, 0, DataLength);
+            ReadData = stream.StreamRead(DataLength);
             stream.Seek(save, SeekOrigin.Begin);
             return ReadData;
         }
-        public static byte[] BytesRead(this Stream stream, int length)
+        public static byte[] StreamRead(this Stream stream, int length)
         {
             byte[] buffer = new byte[length];
             int offset = 0;
