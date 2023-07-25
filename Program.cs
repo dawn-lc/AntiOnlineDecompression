@@ -189,12 +189,13 @@ namespace AntiOnlineDecompression
                             throw new Exception("解密密钥格式错误！");
                         }
                     }
-                    Console.WriteLine("校验文件中...");
+                    Console.Write("校验文件中...");
                     byte[] EncryptFileHash = await InputFile.SHA256HashAsync();
                     if (!EncryptFileHash.SequenceCompare(cryptoKey.Hash))
                     {
                         throw new Exception($"加密文件校验失败！SHA256:{EncryptFileHash.BytesToHexString()}");
                     }
+                    Console.WriteLine("校验完成。");
                     Console.Write("解密中...");
                     using FileStream DecryptFile = new(cryptoKey.Name, FileMode.Create);
                     await Crypto.Decrypto(InputFile, DecryptFile, cryptoKey.Key);
