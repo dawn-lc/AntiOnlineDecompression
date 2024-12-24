@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,6 +70,8 @@ namespace AntiOnlineDecompression
             public static async Task Encrypto(Stream data, Stream cryptodata, byte[] key)
             {
                 Console.Write("加密中...");
+                Stopwatch stopwatch = new();
+                stopwatch.Restart();
                 long SaveDataPosition = data.Position;
                 cryptodata.SetLength(0);
 
@@ -82,12 +85,15 @@ namespace AntiOnlineDecompression
                 cryptodata.Seek(0, SeekOrigin.Begin);
 
                 data.Seek(SaveDataPosition, SeekOrigin.Begin);
+                stopwatch.Stop();
                 Console.WriteLine();
-                Console.WriteLine("加密完成。");
+                Console.WriteLine($"加密完成。耗时{ stopwatch.Elapsed.TimeFormat() }");
             }
             public static async Task Decrypto(Stream cryptodata, Stream data, byte[] key)
             {
                 Console.Write("解密中...");
+                Stopwatch stopwatch = new();
+                stopwatch.Restart();
                 long SaveCryptoDataPosition = cryptodata.Position;
                 data.SetLength(0);
 
@@ -97,8 +103,9 @@ namespace AntiOnlineDecompression
                 data.Seek(0, SeekOrigin.Begin);
 
                 cryptodata.Seek(SaveCryptoDataPosition, SeekOrigin.Begin);
+                stopwatch.Stop();
                 Console.WriteLine();
-                Console.WriteLine("解密完成。");
+                Console.WriteLine($"解密完成。耗时{ stopwatch.Elapsed.TimeFormat() }");
             }
         }
         public static void WriteCryptoKey(string filePath, CryptoKey key)
@@ -142,7 +149,7 @@ namespace AntiOnlineDecompression
             try
             {
                 FileInfo? file;
-                if (!args.Any())
+                if (args.Length == 0)
                 {
                     FileInfo[] fileInfos = new DirectoryInfo(Environment.CurrentDirectory).GetFiles();
                     fileInfos = fileInfos.Where(i => i.FullName != Environment.ProcessPath).ToArray();
@@ -207,10 +214,13 @@ namespace AntiOnlineDecompression
                         byte[] EncryptFileHash;
                         using (FileStream EncryptFile = new(EncryptFilePath, FileMode.OpenOrCreate))
                         {
+                            Stopwatch stopwatch = new();
+                            stopwatch.Restart();
                             await Encrypto(InputFile, EncryptFile, Key);
                             Console.WriteLine("创建校验记录中...");
                             EncryptFileHash = await EncryptFile.SHA256HashAsync();
-                            Console.WriteLine("创建校验记录完成。");
+                            stopwatch.Stop();
+                            Console.WriteLine($"创建校验记录完成。耗时{stopwatch.Elapsed.TimeFormat()}");
                         }
                         cryptoKey = new()
                         {
@@ -221,6 +231,7 @@ namespace AntiOnlineDecompression
                         WriteCryptoKey($"{EncryptFilePath}.aodk", cryptoKey);
                         break;
                 }
+                Console.ReadKey();
                 return 0;
             }
             catch (Exception ex)

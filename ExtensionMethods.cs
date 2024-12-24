@@ -1,5 +1,5 @@
-﻿using CSChaCha20;
-using System;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -50,15 +50,29 @@ namespace AntiOnlineDecompression
             if (a.Length != b.Length) return false;
             return a.SequenceEqual(b);
         }
+
+        public static string TimeFormat(this TimeSpan timeSpan)
+        {
+            return string.Format("{0}{1}{2}{3}{4}",
+            timeSpan.Days > 0 ? $"{timeSpan.Days}天" : "",
+            timeSpan.Hours > 0 ? $"{timeSpan.Hours}小时" : "",
+            timeSpan.Minutes > 0 ? $"{timeSpan.Minutes}分钟" : "",
+            timeSpan.Seconds > 0 ? $"{timeSpan.Seconds}秒" : "",
+            timeSpan.Milliseconds > 0 ? $"{timeSpan.Milliseconds}毫秒" : "低于1毫秒").Trim();
+        }
+
         public static async Task VerifyHash(this Stream stream, byte[] hash)
         {
-            Console.WriteLine("校验中...");
+            Console.WriteLine("校验中..."); 
+            Stopwatch stopwatch = new();
+            stopwatch.Restart();
             byte[] streamHash = await stream.SHA256HashAsync();
+            stopwatch.Stop();
             if (!streamHash.SequenceCompare(hash))
             {
-                throw new Exception($"校验失败！{Environment.NewLine}(A)SHA256:{streamHash.BytesToHexString()}{Environment.NewLine}(B)SHA256:{hash.BytesToHexString()}");
+                throw new Exception($"校验失败！耗时{stopwatch.Elapsed.TimeFormat()}{Environment.NewLine}(A)SHA256:{streamHash.BytesToHexString()}{Environment.NewLine}(B)SHA256:{hash.BytesToHexString()}");
             }
-            Console.WriteLine("校验完成。");
+            Console.WriteLine($"校验完成。耗时{stopwatch.Elapsed.TimeFormat()}");
         }
         public static byte[] RandomBytes(int length)
         {
@@ -66,15 +80,11 @@ namespace AntiOnlineDecompression
         }
         public static byte[] StreamRead(this Stream stream, long a, long b)
         {
-            if ((b - a) > int.MaxValue || stream.Length < 4)
-            {
-                throw new OverflowException();
-            }
+            if ((b - a) > int.MaxValue || stream.Length < 4) throw new OverflowException();
             long save = stream.Position;
-            int DataLength = (int)(b - a);
             byte[] ReadData;
             stream.Seek(a, SeekOrigin.Begin);
-            ReadData = stream.StreamRead(DataLength);
+            ReadData = stream.StreamRead((int)(b - a));
             stream.Seek(save, SeekOrigin.Begin);
             return ReadData;
         }
@@ -128,7 +138,7 @@ namespace AntiOnlineDecompression
         public static async Task Encrypto(this Stream data, Stream encrypted, byte[] key, byte[] iv)
         {
             int bytesRead;
-            byte[] buffer = new byte[1024 * 1024 * 8];
+            byte[] buffer = new byte[1024 * 1024 * 4];
             ChaCha20 Encrypto = new(key, iv, 0);
             while ((bytesRead = await data.ReadAsync(buffer)) != 0)
             {
