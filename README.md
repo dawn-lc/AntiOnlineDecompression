@@ -10,12 +10,11 @@ AntiOnlineDecompression 是一个开源工具，旨在防止各类网盘的在�
 
 ## 开始
 
-* GitHub Release
- **[下载](https://github.com/dawn-lc/AntiOnlineDecompression/releases/download/latest/AntiOnlineDecompression.exe)**
+#### GitHub Release 
 
-* 从源码编译
+[下载程序](https://github.com/dawn-lc/AntiOnlineDecompression/releases/download/latest/AntiOnlineDecompression.exe)
 
-本工具基于 .NET 9 AOT（Ahead Of Time）编译。请确保您的系统已安装 .NET 9 运行时环境。
+#### 从源码编译
 
 1. 从 [GitHub 仓库](https://github.com/dawn-lc/AntiOnlineDecompression) 克隆或下载最新版本的代码。
 
@@ -25,7 +24,7 @@ AntiOnlineDecompression 是一个开源工具，旨在防止各类网盘的在�
    dotnet publish -c Release -r win-x64
    ```
 
-3. 在生成的发布文件夹中，找到可执行文件 `AntiOnlineDecompression.exe`，即可开始使用。
+3. 在生成的发布文件夹中，找到可执行文件 `AntiOnlineDecompression.exe`。
 
 ## 使用说明
 
