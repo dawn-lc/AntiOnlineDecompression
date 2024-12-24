@@ -1,50 +1,50 @@
 # AntiOnlineDecompression
 
-AntiOnlineDecompression ��һ����Դ���ߣ�ּ�ڷ�ֹ�������̵����߽�ѹ���ܵ����ļ�������Ϣй¶��
+AntiOnlineDecompression 是一个开源工具，旨在防止各类网盘的在线解压功能导致文件内容信息泄露。
 
-## ����
+## 功能
 
-- **�ļ�����**������ ChaCha20 �����㷨��ʵ���˼����ļ��������Կ�������ƣ�ȷ���ļ��ڴ���ʹ洢�����еİ�ȫ�ԡ�
+- **文件加密**：采用 ChaCha20 加密算法，采用了加密文件与解密密钥分离的设计，确保文件在传输和存储过程中的安全性。
 
-- **�ļ�����**���������ļ��ͽ�����Կ����ͬһ�ļ����У�ʹ�øù��ߴ򿪼����ļ������߻��Զ����ҽ�����Կ�����н��ܡ�
+- **文件解密**：将加密文件和解密密钥置于同一文件夹中，使用该工具打开加密文件，工具会自动查找解密密钥并进行解密。
 
-## ��ʼ
+## 开始
 
 * GitHub Release
- **[����](https://github.com/dawn-lc/AntiOnlineDecompression/releases/download/latest/AntiOnlineDecompression.exe)**
+ **[下载](https://github.com/dawn-lc/AntiOnlineDecompression/releases/download/latest/AntiOnlineDecompression.exe)**
 
-* ��Դ�����
+* 从源码编译
 
-�����߻��� .NET 9 AOT��Ahead Of Time�����롣��ȷ������ϵͳ�Ѱ�װ .NET 9 ����ʱ������
+本工具基于 .NET 9 AOT（Ahead Of Time）编译。请确保您的系统已安装 .NET 9 运行时环境。
 
-1. �� [GitHub �ֿ�](https://github.com/dawn-lc/AntiOnlineDecompression) ��¡���������°汾�Ĵ��롣
+1. 从 [GitHub 仓库](https://github.com/dawn-lc/AntiOnlineDecompression) 克隆或下载最新版本的代码。
 
-2. ����Ŀ��Ŀ¼�£�ʹ���������������Ŀ��
+2. 在项目根目录下，使用以下命令编译项目：
 
    ```bash
    dotnet publish -c Release -r win-x64
    ```
 
-3. �����ɵķ����ļ����У��ҵ���ִ���ļ� `AntiOnlineDecompression.exe`�����ɿ�ʼʹ�á�
+3. 在生成的发布文件夹中，找到可执行文件 `AntiOnlineDecompression.exe`，即可开始使用。
 
-## ʹ��˵��
+## 使用说明
 
-### �����ļ�
+### 加密文件
 
-1. ����Ҫ���ܵ��ļ�ʹ�ñ����ߴ򿪡�
+1. 将需要加密的文件使用本工具打开。
 
-���߽����������ļ������ܺ���ļ���������Կ�ļ���
+工具将生成两个文件：加密后的文件、解密密钥文件。
 
-### �����ļ�
+### 解密文件
 
-1. ȷ�������ļ��Ͷ�Ӧ�Ľ�����Կ�ļ��Լ�������λ��ͬһ�ļ����С�
+1. 确保加密文件和对应的解密密钥文件以及本工具位于同一文件夹中。
 
-2. ���б�����
+2. 运行本工具
 
-���߽��Զ����ҽ�����Կ�����н��ܡ�
+工具将自动查找解密密钥并进行解密。
 
-## ע������
+## 注意事项
 
-- �����ڹ��������ļ�ʱ����������Կһͬ�ϴ�������ȫ�����̡�
+- 请勿在共享加密文件时，将解密密钥一同上传至不安全的网盘。
 
-- ����ͨ��������ȫ�ֶΣ�����ܵĵ����ʼ���ȫ����Ϣ����Ӧ�ã�����������Կ��
+- 建议通过其他安全手段（如加密的电子邮件或安全的消息传递应用）共享解密密钥。
