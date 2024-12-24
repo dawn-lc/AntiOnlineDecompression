@@ -1,6 +1,6 @@
 # AntiOnlineDecompression
 
-AntiOnlineDecompression 是一个开源工具，旨在防止各类网盘的在线解压功能导致文件内容信息泄露。
+AntiOnlineDecompression 是一个开源工具，旨在防止在不安全的网盘中文件被在线解压。
 
 ## 功能
 
